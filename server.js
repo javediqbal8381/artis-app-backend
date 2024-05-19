@@ -75,10 +75,6 @@ const PORT = 4000;
 app.use(cors())
 app.use(express.json())
 
-app.get('/', (req, res) => {
-    return res.status(200).json("Api is Running");
-})
-
 // Use products route
 app.use('/api/users', usersRoute);
 
@@ -100,7 +96,9 @@ app.use('/api/conversations', conversationsRoute);
 app.use('/api/messages', messagesRoute);
 
 
-
+app.get('/', (req, res) => {
+    res.send('artis-app API is running');
+});
 
 server.listen(PORT, () => {
     console.log(`server on port ${PORT}`)
