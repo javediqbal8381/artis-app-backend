@@ -75,6 +75,10 @@ const PORT = 4000;
 app.use(cors())
 app.use(express.json())
 
+app.get('/', (req, res) => {
+    return res.status(200).json("Api is Running");
+})
+
 // Use products route
 app.use('/api/users', usersRoute);
 
