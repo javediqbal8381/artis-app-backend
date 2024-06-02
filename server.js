@@ -2,9 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const connectDB = require('./db');
 require('dotenv').config();
-const { Server } = require("socket.io")
 const { createServer } = require('http')
-
 
 // routes
 const usersRoute = require('./routes/usersRoute');
@@ -15,57 +13,7 @@ const conversationsRoute = require('./routes/conversationsRoute');
 const messagesRoute = require('./routes/messagesRoute');
 const analyticsRoute = require('./controllers/analyticsController')
 
-
-
 const app = express();
-
-const server = createServer(app);
-
-const io = new Server(server, {
-    cors: {
-        origin: "http://localhost:5173",
-        methods: ["GET", "POST"],
-        credentials: true
-    }
-});
-
-let users = [];
-
-const addUser = (userId, socketId) => {
-    !users.some((user) => user.userId === userId) &&
-        users.push({ userId, socketId })
-}
-
-const removeUser = (socketId) => {
-    users = users.filter(user => user.socketId !== socketId)
-}
-
-const getUser = (userId) => {
-    return users.find(user => user.userId === userId)
-}
-
-io.on('connection', (socket) => {
-    socket.on("addUser", userId => {
-        addUser(userId, socket.id);
-        io.emit("getUsers", users)
-    })
-
-    socket.on("sendMessage", ({ senderId, receiverId, text, type }) => {
-        const user = getUser(receiverId)
-        if (user) {
-            io.to(user.socketId).emit("sendMessage", {
-                senderId,
-                text,
-                type,
-            })
-        }
-    })
-
-    socket.on("disconnect", () => {
-        removeUser(socket.id);
-        io.emit("getUsers", users);
-    })
-});
 
 // Connect to MongoDB
 connectDB();
@@ -100,7 +48,7 @@ app.get('/', (req, res) => {
     res.send('artis-app API is running');
 });
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`server on port ${PORT}`)
 })
 
